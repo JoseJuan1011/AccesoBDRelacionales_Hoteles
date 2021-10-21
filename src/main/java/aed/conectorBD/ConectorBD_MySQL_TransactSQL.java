@@ -69,7 +69,7 @@ public class ConectorBD_MySQL_TransactSQL {
 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
 		String serverUrl = "jdbc:sqlserver://localhost:1433;databaseName=bdHoteles";
-		String username = "dbo";
+		String username = "root";
 		String password = "";
 
 		Connection conn = DriverManager.getConnection(serverUrl, username, password);
