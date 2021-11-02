@@ -1,33 +1,13 @@
-package aed.conectorBD;
+package aed.accesoBDRelaciones_Hoteles.resources;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ConectorBD_MySQL_TransactSQL {
-
-	public static void main(String[] args) throws ClassNotFoundException, SQLException {
-
-		Connection conn;
-
-		conn = switchConnection(2);
-
-		PreparedStatement p_stmt = conn.prepareStatement("SELECT codHotel, numHabitacion FROM HABITACIONES");
-		p_stmt.execute("use bdHoteles;");
-		System.out.println("bdHoteles Seleccionada");
-
-		ResultSet rs = p_stmt.executeQuery();
-
-		while (rs.next()) {
-			System.out
-					.println("codHotel: " + rs.getString("codHotel") + " numHabitacion: " + rs.getInt("numHabitacion"));
-		}
-
-	}
-
-	private static Connection switchConnection(int dbNumber) {
+public class Conectordb {
+	
+	public static Connection switchConnection(int dbNumber) {
 		switch (dbNumber) {
 		case 1:
 			try {
@@ -44,7 +24,11 @@ public class ConectorBD_MySQL_TransactSQL {
 			}
 
 		case 3:
-			return null;
+			try {
+				return AccessSQLConnection();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
 		default:
 			System.out.println("No ha seleccionado base de datos");
@@ -70,11 +54,22 @@ public class ConectorBD_MySQL_TransactSQL {
 
 		String serverUrl = "jdbc:sqlserver://localhost:1433;databaseName=bdHoteles";
 		String username = "root";
-		String password = "";
+		String password = "root";
 
 		Connection conn = DriverManager.getConnection(serverUrl, username, password);
 		System.out.println("Connected Succesfully (SQL Server)");
 
+		return conn;
+	}
+	
+	private static Connection AccessSQLConnection() throws ClassNotFoundException, SQLException {
+		Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+		
+		String dbURL = "jdbc:ucanaccess://" + new File("src\\main\\resources\\bdHoteles.accdb").getAbsolutePath();
+		
+		Connection conn = DriverManager.getConnection(dbURL);
+		System.out.println("Connected Succesfully (Access)");
+		
 		return conn;
 	}
 }
