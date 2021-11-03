@@ -12,7 +12,11 @@ public class Statements {
 	
 	private static Scanner teclado;
 	
-	public static boolean EliminarAction(Connection connTypeBD, int tipoDB) {
+	private static String codHotel;
+	
+	private static int numHabitacion, capacidad, preciodia, activa;
+	
+	public static void EliminarAction(Connection connTypeBD, int tipoDB) {
 		teclado = new Scanner(System.in);
 		conn = connTypeBD;
 		System.out.println("Escriba los datos del registro a Eliminar: ");
@@ -49,16 +53,13 @@ public class Statements {
 				ps.executeUpdate();
 				
 				System.out.println("Eliminación Completada");
-				return true;
 			} catch (SQLException e) {
 				e.printStackTrace();
-				return false;
 			}
 			
 		}
 		else {
 			System.out.println("No existe tal registro en la base de datos");
-			return false;
 		}	
 	}
 	
@@ -93,4 +94,61 @@ public class Statements {
 		}
 	}
 
+	
+	public static void InsertarAction(Connection connection) {
+		teclado = new Scanner(System.in);
+		conn = connection;
+		
+		System.out.println("Escriba aquí los datos del registro a insertar: ");
+		try {
+			System.out.print("codHotel, aquí las opciones -> "+codHotelComboBox()+": ");
+			codHotel = teclado.next();
+			System.out.print("numHabitación: ");
+			numHabitacion = teclado.nextInt();
+			System.out.print("capacidad: ");
+			capacidad = teclado.nextInt();
+			System.out.print("preciodia: ");
+			preciodia = teclado.nextInt();
+			System.out.print("activa: ");
+			activa = teclado.nextInt();
+			System.out.println("¿Está seguro que quiere insertar el siguiente registro (S/N)?: ");
+			System.out.println("codHotel | numHabitacion | capacidad | preciodia | activa");
+			System.out.println("---------------------------------------------------------");
+			System.out.println("| "+codHotel+" | "+numHabitacion+" | "+capacidad+" | "+preciodia+" | "+activa);
+			System.out.println("---------------------------------------------------------");
+			String param = teclado.next();
+			while (param.equals("N")&&!param.equals("S")) {
+				if (!param.equals("N")) {
+					while (!(param.equals("S"))&&!(param.equals("N"))) {
+						System.out.println("Elija una de las opciones permitidas (S/N): ");
+						param = teclado.next();
+					}
+				}
+				InsertarAction(conn);
+			}
+			
+			PreparedStatement ps = conn.prepareStatement("Insert into habitaciones values (?,?,?,?,?)");
+			ps.setString(1, codHotel);
+			ps.setInt(2, numHabitacion);
+			ps.setInt(3,capacidad);
+			ps.setInt(4, preciodia);
+			ps.setInt(5, activa);
+			ps.executeQuery();
+			
+			System.out.println("Insercción Completada");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static String codHotelComboBox() throws SQLException {
+		String aux = " | ";
+		
+		PreparedStatement ps = conn.prepareStatement("Select codHotel from hoteles");
+		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			aux+=rs.getString(1)+" | ";
+		}
+		return aux;
+	}
 }

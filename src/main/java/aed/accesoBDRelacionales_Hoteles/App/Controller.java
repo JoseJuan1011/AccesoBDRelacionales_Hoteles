@@ -81,6 +81,10 @@ public class Controller {
 	
 	private void execActions() {
 		switch (tipoAccion) {
+		case 1:
+			Statements.InsertarAction(connection);
+		break;
+		
 		case 3:
 			Statements.EliminarAction(connection, tipoDB);
 			
