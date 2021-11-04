@@ -37,7 +37,12 @@ public class Controller {
 		System.out.println("Elija la base de datos con la que trabajar (Utilize solo números): ");
 		System.out.println("-- 1-.MySQL \n-- 2-.SQL Server \n-- 3-.Acccess ");
 		setTipoDB(teclado.nextInt());
-		connection = Conectordb.switchConnection(getTipoDB());
+		try {
+			connection = Conectordb.switchConnection(getTipoDB());
+		}
+		catch (Exception e) {
+			System.out.println("No se pudo conectar a la base de datos en cuestión");
+		}
 		execOptions();
 		teclado.close();
 	}
@@ -159,7 +164,7 @@ public class Controller {
 			System.out.println("---------------------------------------------------------------------------------");
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println("No se pudo mostrar la tabla habitaciones");
 		}
 	}
 	

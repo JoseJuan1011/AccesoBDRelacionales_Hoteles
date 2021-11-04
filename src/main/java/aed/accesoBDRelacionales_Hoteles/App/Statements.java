@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import aed.accesoBDRelaciones_Hoteles.resources.Conectordb;
+
 public class Statements {
 	
 	private static Connection conn;
@@ -58,7 +60,7 @@ public class Statements {
 			
 			System.out.println("Insercción Completada");
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println("Insercción No Completada");
 		}
 	}
 
@@ -83,22 +85,6 @@ public class Statements {
 		codHotel = teclado.next();
 		System.out.print("numHabitación: ");
 		numHabitacion = teclado.nextInt();
-		
-		System.out.println("¿Está seguro que quiere modificar el siguiente registro (S/N)?: ");
-		System.out.println("codHotel | numHabitacion | capacidad | preciodia | activa");
-		System.out.println("---------------------------------------------------------");
-		System.out.println("| "+codHotel+"  |       "+numHabitacion+"       |     "+capacidad+"     |     "+preciodia+" | "+activa);
-		System.out.println("---------------------------------------------------------");
-		String param = teclado.next();
-		while (param.equals("N")&&!param.equals("S")) {
-			if (!param.equals("N")) {
-				while (!(param.equals("S"))&&!(param.equals("N"))) {
-					System.out.println("Elija una de las opciones permitidas (S/N): ");
-					param = teclado.next();
-				}
-			}
-			ModificarAction(conn);
-		}
 		
 		if (mostrarRegistroAModificar()) {
 			int[] datos = new int[3];
@@ -155,7 +141,7 @@ public class Statements {
 				
 				System.out.println("Modificación Realizada");
 			} catch (SQLException e) {
-				e.printStackTrace();
+				System.out.println("Modificación no Realizada");
 			}
 		}
 		else {
@@ -186,21 +172,28 @@ public class Statements {
 			while (rs.next()) {
 				System.out.println(" "+rs.getString("codHotel")+"  |       "+rs.getInt("numHabitacion")+"       |     "+rs.getInt("capacidad")+"     |     "+rs.getInt("preciodia")+" | "+rs.getInt("activa"));
 			}
-			System.out.println("-----------------------------------------------------------");
-			switch (teclado.next()) {
-			case "S":
-				return true;
-				
-			case "N":
-				return false;
-				
-			default:
-				System.out.println("No se escribió un parámetro valido");
-				return false;
-			}
+			
+			return switchBooleano();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println("No se pudo mostrar el registro a Modificar");
 			return false;
+		}
+	}
+
+	
+	private static boolean switchBooleano() {
+		String param = teclado.next();
+		switch (param) {
+		case "S":
+			return true;
+		case "N":
+			return false;
+		default:
+			while (!(param.equals("S"))&&!(param.equals("N"))) {
+				System.out.println("Elija una de las opciones permitidas (S/N): ");
+				param = teclado.next();
+			}
+			return switchBooleano();
 		}
 	}
 
@@ -242,7 +235,7 @@ public class Statements {
 				
 				System.out.println("Eliminación Completada");
 			} catch (SQLException e) {
-				e.printStackTrace();
+				System.out.println("Eliminación Incompleta");
 			}
 			
 		}
@@ -277,7 +270,7 @@ public class Statements {
 				return false;
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println("No se pudo mostrar el registro a eliminar");
 			return false;
 		}
 	}
@@ -299,13 +292,25 @@ public class Statements {
 	}
 
 	private static void Procedimiento1(Connection connection, int tipoDB) throws SQLException {
+		teclado = new Scanner(System.in);
+		System.out.println("Escriba el nombre de Hotel a visualizar: ");
+		conn = connection;
 		PreparedStatement ps;
-		ResultSet rs;
 		if (tipoDB==2) {
-			
+			ps = conn.prepareStatement("exec procHabitacionesHotel @nomHotel = ?");
+			ps.setEscapeProcessing(true);
+	        ps.setQueryTimeout(0);
 		}
 		else {
-			
+			ps = conn.prepareStatement("call proc_habitaciones_hotel (?);");
 		}
+		ps.setString(1, "Barceló Canarias");
+        ResultSet rs = ps.executeQuery();
+        System.out.println("numHabitacion | capacidad | preciodia | activa");
+        System.out.println("----------------------------------------------");
+        while (rs.next()) {
+        	System.out.println("      "+rs.getString(1).trim()+"       |     "+rs.getInt(2)+"     |    "+rs.getInt(3)+"     |    "+rs.getInt(4));
+        }
+        System.out.println("----------------------------------------------");
 	}
 }
