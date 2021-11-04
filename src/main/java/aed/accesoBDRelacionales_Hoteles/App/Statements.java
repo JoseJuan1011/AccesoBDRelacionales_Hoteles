@@ -84,42 +84,76 @@ public class Statements {
 		System.out.print("numHabitación: ");
 		numHabitacion = teclado.nextInt();
 		
+		System.out.println("¿Está seguro que quiere modificar el siguiente registro (S/N)?: ");
+		System.out.println("codHotel | numHabitacion | capacidad | preciodia | activa");
+		System.out.println("---------------------------------------------------------");
+		System.out.println("| "+codHotel+"  |       "+numHabitacion+"       |     "+capacidad+"     |     "+preciodia+" | "+activa);
+		System.out.println("---------------------------------------------------------");
+		String param = teclado.next();
+		while (param.equals("N")&&!param.equals("S")) {
+			if (!param.equals("N")) {
+				while (!(param.equals("S"))&&!(param.equals("N"))) {
+					System.out.println("Elija una de las opciones permitidas (S/N): ");
+					param = teclado.next();
+				}
+			}
+			ModificarAction(conn);
+		}
+		
 		if (mostrarRegistroAModificar()) {
-			boolean capacidadBool = false, preciodiaBool = false, activaBool = false;
+			int[] datos = new int[3];
+			int i = 0;
 			System.out.println("Escriba aquí los valores a modificar (si no quiere modificar el valor, dele a Enter): ");
 			String camposAModificar="";
 			String capacidadNuevo,preciodiaNuevo,activaNuevo;
-			
+			boolean capacidadModificar, preciodiaModificar, activaModificar;
 			System.out.print("capacidad: ");
+			teclado.nextLine();
 			capacidadNuevo = teclado.nextLine();
-			if(validarInt(capacidadNuevo)) {
+			if(capacidadModificar=validarInt(capacidadNuevo)) {
 				camposAModificar+="capacidad = ?;";
-				capacidadBool = true;
+				datos[i] = Integer.parseInt(capacidadNuevo);
+				i++;
 			}
-			
-			System.out.println("preciodia: ");
+			System.out.print("preciodia: ");
 			preciodiaNuevo = teclado.nextLine();
-			if (validarInt(preciodiaNuevo)) {
+			if (preciodiaModificar=validarInt(preciodiaNuevo)) {
 				camposAModificar+="preciodia = ?;";
-				preciodiaBool = true;
+				datos[i] = Integer.parseInt(preciodiaNuevo);
+				i++;
 			}
 			
-			System.out.println("activa: ");
+			System.out.print("activa: ");
 			activaNuevo = teclado.nextLine();
-			if (validarInt(activaNuevo)) {
+			if (activaModificar=validarInt(activaNuevo)) {
 				camposAModificar+="activa = ?";
-				activaBool = true;
+				datos[i] = Integer.parseInt(activaNuevo);
+				i++;
 			}
 			
 			camposAModificar = camposAModificar.replaceAll(";", ",");
-			System.out.println("Update from habitaciones set \"+camposAModificar+\" where codHotel= ? and numHabitacion=?");
 			
 			try {
-				PreparedStatement ps = conn.prepareStatement("Update from habitaciones set "+camposAModificar+" where codHotel= ? and numHabitacion=?");
-				if (capacidadBool) {
-					
+				int j = 1;
+				PreparedStatement ps = conn.prepareStatement("Update habitaciones set "+camposAModificar+" where codHotel= ? and numHabitacion=?");
+				if (capacidadModificar) {
+					ps.setInt(j, datos[j-1]);
+					j++;
 				}
-					
+				if (preciodiaModificar) {
+					ps.setInt(j, datos[j-1]);
+					j++;
+				}
+				if (activaModificar) {
+					ps.setInt(j, datos[j-1]);
+					j++;
+				}
+				ps.setString(j, codHotel);
+				j++;
+				ps.setInt(j, numHabitacion);
+				ps.executeUpdate();
+				
+				System.out.println("Modificación Realizada");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

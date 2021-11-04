@@ -29,8 +29,7 @@ public class TrialConnectionsMain {
 		try {
 			Integer.parseInt(num);
 			return true;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			return false;
 		}
 	}
