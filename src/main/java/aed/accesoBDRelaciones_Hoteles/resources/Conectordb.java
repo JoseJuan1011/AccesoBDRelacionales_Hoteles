@@ -45,6 +45,8 @@ public class Conectordb {
 
 		Connection conn = DriverManager.getConnection(serverUrl, username, password);
 		System.out.println("Connected Succesfully (MySQL)");
+		
+		conn.prepareStatement("use bdHoteles;").executeUpdate();
 
 		return conn;
 	}
@@ -58,6 +60,8 @@ public class Conectordb {
 
 		Connection conn = DriverManager.getConnection(serverUrl, username, password);
 		System.out.println("Connected Succesfully (SQL Server)");
+		
+		conn.prepareStatement("use bdHoteles").executeUpdate();
 
 		return conn;
 	}

@@ -84,36 +84,45 @@ public class Statements {
 		System.out.print("numHabitación: ");
 		numHabitacion = teclado.nextInt();
 		
-		boolean capacidadBool = false, preciodiaBool = false, activaBool = false;
 		if (mostrarRegistroAModificar()) {
+			boolean capacidadBool = false, preciodiaBool = false, activaBool = false;
 			System.out.println("Escriba aquí los valores a modificar (si no quiere modificar el valor, dele a Enter): ");
-			System.out.print("capacidad: ");
 			String camposAModificar="";
 			String capacidadNuevo,preciodiaNuevo,activaNuevo;
 			
+			System.out.print("capacidad: ");
 			capacidadNuevo = teclado.nextLine();
 			if(validarInt(capacidadNuevo)) {
 				camposAModificar+="capacidad = ?;";
+				capacidadBool = true;
 			}
 			
 			System.out.println("preciodia: ");
 			preciodiaNuevo = teclado.nextLine();
 			if (validarInt(preciodiaNuevo)) {
 				camposAModificar+="preciodia = ?;";
+				preciodiaBool = true;
 			}
 			
 			System.out.println("activa: ");
 			activaNuevo = teclado.nextLine();
 			if (validarInt(activaNuevo)) {
 				camposAModificar+="activa = ?";
+				activaBool = true;
 			}
 			
+			camposAModificar = camposAModificar.replaceAll(";", ",");
+			System.out.println("Update from habitaciones set \"+camposAModificar+\" where codHotel= ? and numHabitacion=?");
 			
-			
-//			while (!(capacidadParam.equals("S"))&&!(capacidadParam.equals("N"))) {
-//				System.out.println("Elija una de las opciones permitidas (S/N): ");
-//				capacidadParam = teclado.next();
-//			}
+			try {
+				PreparedStatement ps = conn.prepareStatement("Update from habitaciones set "+camposAModificar+" where codHotel= ? and numHabitacion=?");
+				if (capacidadBool) {
+					
+				}
+					
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		else {
 			System.out.println("No existe tal registro en la base de datos");
