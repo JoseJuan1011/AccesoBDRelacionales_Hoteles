@@ -287,13 +287,14 @@ public class Statements {
 			}
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println("No se pudo realizar el procedimiento en cuestión");
 		}
 	}
 
 	private static void Procedimiento1(Connection connection, int tipoDB) throws SQLException {
 		teclado = new Scanner(System.in);
 		System.out.println("Escriba el nombre de Hotel a visualizar: ");
+		String nomHotel = teclado.next();
 		conn = connection;
 		PreparedStatement ps;
 		if (tipoDB==2) {
@@ -304,7 +305,7 @@ public class Statements {
 		else {
 			ps = conn.prepareStatement("call proc_habitaciones_hotel (?);");
 		}
-		ps.setString(1, "Barceló Canarias");
+		ps.setString(1, nomHotel);
         ResultSet rs = ps.executeQuery();
         System.out.println("numHabitacion | capacidad | preciodia | activa");
         System.out.println("----------------------------------------------");
