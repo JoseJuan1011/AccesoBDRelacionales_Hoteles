@@ -24,10 +24,6 @@ public class Controller {
 		this(0,null);
 	}
 	
-	public Controller(int tipoDB) {
-		this(tipoDB,Conectordb.switchConnection(tipoDB));	
-	}
-	
 	private Controller(int tipoDB, Connection connection) {
 		teclado = new Scanner(System.in);
 		this.tipoDB = tipoDB;
@@ -80,26 +76,66 @@ public class Controller {
 	}
 	
 	private void execActions() {
+		String param = "";
 		switch (tipoAccion) {
 		case 1:
 			Statements.InsertarAction(connection);
-		break;
-		
-		case 3:
-			Statements.EliminarAction(connection, tipoDB);
 			
 			System.out.println("¿Quiere seguir (S/N)?");
-			String param = teclado.next();
+			param = teclado.next();
 			while (!(param.equals("S"))&&!(param.equals("N"))) {
 				System.out.println("Elija una de las opciones permitidas (S/N): ");
 				param = teclado.next();
 			}
 			
 			if (param.equals("S")) {
-				VisualizeTableHabitaciones();
 				execOptions();
 			}
+		break;
+		
+		case 2:
+			Statements.ModificarAction(connection);
 			
+			System.out.println("¿Quiere seguir (S/N)?");
+			param = teclado.next();
+			while (!(param.equals("S"))&&!(param.equals("N"))) {
+				System.out.println("Elija una de las opciones permitidas (S/N): ");
+				param = teclado.next();
+			}
+			
+			if (param.equals("S")) {
+				execOptions();
+			}
+		break;
+		
+		case 3:
+			Statements.EliminarAction(connection, tipoDB);
+			
+			System.out.println("¿Quiere seguir (S/N)?");
+			param = teclado.next();
+			while (!(param.equals("S"))&&!(param.equals("N"))) {
+				System.out.println("Elija una de las opciones permitidas (S/N): ");
+				param = teclado.next();
+			}
+			
+			if (param.equals("S")) {
+				execOptions();
+			}
+		break;
+		
+		case 4:
+			Statements.ProcedimientosAction(connection, tipoDB, tipoProcedimiento);
+			
+			System.out.println("¿Quiere seguir (S/N)?");
+			param = teclado.next();
+			while (!(param.equals("S"))&&!(param.equals("N"))) {
+				System.out.println("Elija una de las opciones permitidas (S/N): ");
+				param = teclado.next();
+			}
+			
+			if (param.equals("S")) {
+				execOptions();
+			}
 		break;
 		}
 	}
