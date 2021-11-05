@@ -1,0 +1,64 @@
+Conexion a Access, pasos a seguir:
+
+1-. Creamos un conector obdc, cualo driver es para SQL Server.
+    1.1-.Primero vamos a Panel de Control -> Herramientas Administrativas (para verlo mejor seleccione ver como iconos largos en vez de categorías) 
+    -> origen de datos (OBDC) (64-bit).
+
+    1.2-.Clikeamos en la pestaña DSN de Usuario, y pulsamos añadir.
+
+    1.3-.Primero seleccionamos el tipo de driver, en este caso se llama "ODBC Driver for SQL Server", y pulsamos finalizar.
+
+    1.4-.Ahora, rellenamos los campos con los datos necesarios, siendo los importantes Nombre (cualquiera puede poner, preferible referencial) y 
+    Servidor (En este caso necesitamos irnos a nuestro SQL Server Managment Studio, y el campo de texto que aparece como nombre del servidor, ese 
+    es el dato necesario ahora mismo), y le damos a siguiente.
+
+    1.5-.A continuación, seleccionamos con autenticicación de SQL Server, y escribimos nuestro usuario y contraseña de nuestro login de SQL Server, y
+    pulsamos siguiente.
+
+    1.6-.Seleccionamos el checkbox de cambiar la base de datos por defecto, en el ComboBox seleccionamos nuestra base de datos bdHoteles, y pulsamos siguiente.
+        1.6.1-.En caso que de un error no relacionado con el usuario o contraseña introducidos, o problemas de conexión con SQL Server en sí; entonces la opción
+        recomendada es dentro de nuestro SSMS (SQL Server Managment Studio), vamos a Explorador de Objetos y reiniciamos nuestro servidor (Darle a sí en el pop-up
+        el cual aparecerá después).
+    
+    1.7-.(Opcional) Si se prefiere cambiar el mensaje del sistema de SQL Server chekeando el checkbox y cambiando por el idioma preferido en cuestión, y pulsamos finalizar.
+
+    1-8-.En la ventana emergente la cual muestra los datos de nuestro DSN, pulsamos probar origen de datos, para probar la conexion en caso de errores inesperados, cuando todo
+    esté correcto, pulsamos OK.
+
+2-. Importamos los datos a la base de datos de Access.
+    2.1-.Creamos una nueva base de datos desde el programa de access, seleccionando base de datos en blanco, y guardando el archivo en un lugar de nuestro workspace (tomando bdHoteles
+    como nombre recomendado, y la carpeta src/main/resources como recomendable para guardar nuestra base de datos y acceder a ella desde nuestro código).
+
+    2.2-.Ahora vamos a Datos Externos -> Nuevo Origen de Datos -> De una base de datos -> Desde SQL Server.
+
+    2.3-.Seleccionamos la primera opción (Importar el origen de datos en una nueva base de datos actual.), y pulsamos aceptar.
+
+    2.4-.Vamos a la pestaña de origenes de datos de la maquina, seleccionamos el odbc que creamos en el paso 1, y pulsamos ok.
+
+    2.5-.Introducimos nuestro Usuario y Contraseña de SQL Server (en el caso que haya puesto como requisito en el login de SQL Server que tenga que cambiar de contraseña, entonces pulse en
+    el botón de más opciones), y pulsamos OK.
+
+    2.6-.Seleccionamos las tablas principales de nuestra base de datos (no pasa nada si elige hasta todas siempre que sepa lo que esté haciendo), las cuales aparecen con el prefijo "dbo.",
+    y pulsamos OK.
+
+    2.7-.(Opcional) Nos aparecerá una ventana la cual nos preguntará si queremos guardar el proceso de importar la base de datos (tomando en cuenta que solo estará disponible para esa
+    base de datos), en caso afirmativo solo haría falta ponerle un nombre, de preferencia referencial, y si queréis ver o utilizar las importaciones guardadas, solo hay que ir a 
+    Datos Externos -> Importaciones Guardadas, y nos las encontraremos.
+
+    2.8-.Le quitamos los prefijos "dbo_" a las tablas para evitar problemas de sintaxis a futuro, mediante click derecho -> renombrar.
+
+3-.Ya estarían todos los datos importados de SQL Server a la base de datos de Access.
+
+Nota: a la hora de declarar la ruta en la que va a estar nuestra base de datos access en java, se ha de tomar en cuenta que la ruta tomada como de origen para el programa es nuestra ruta de proyecto.
+Por lo cual si por ejemplo van a ponerla en la carpeta resources, entonces la ruta relativa sería "src\main\resources". (Muy importante para evitar FileNotFoundException() a la hora de intentar 
+conectar con la base de datos).
+
+    
+
+
+
+
+
+
+
+

@@ -1,0 +1,89 @@
+Conexion a SQL Server, pasos a seguir:
+
+1-. Configurar el Administrador de Configuración de SQL Server:
+
+	1.1-.Para ello primero vaya a su explorador de archivos.
+
+	1.2-.En el campo de texto coloque una de las rutas siguientes, dependiendo de la version de su SQL Server:
+		--2019: C:\Windows\SysWOW64\SQLServerManager15.msc
+		--2017: C:\Windows\SysWOW64\SQLServerManager14.msc
+		--2016: C:\Windows\SysWOW64\SQLServerManager13.msc
+		--2014(12.x): C:\Windows\SysWOW64\SQLServerManager12.msc
+		--2012(11.x): C:\Windows\SysWOW64\SQLServerManager11.msc
+
+	1.3-.Dirijase a Configuracion de la red de SQL Server -> Protocolos para MSSQLSERVER
+
+	1.4-.Clickamos botón derecho sobre el protocolo "TCP/IP" y seleccionamos habilitar, así mismo con el restante
+
+
+2-. Importamos mediante archivo .jar o dependencia de maven el driver para SQL Server:
+
+	Forma Maven:
+
+	2.1.A-.Importamos la dependencia poniéndola dentro del pom (aquí el código):
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>9.4.0.jre11</version>
+		</dependency>
+
+		(Para Cambiar el jre compatible con el driver, hay que cambiar el numero que aparece 
+		dentro de la etiqueta version, al lado de "jre", siendo 8 y 16 los jre disponibles con este driver)
+
+	2.2.A-.Actualizamos el projecto Maven con Alt+F5 o mediante click derecho -> Maven -> Update Project, para así importar las librerias y ya estaría.
+
+	Forma .jar:
+
+	2.1.B-.Descargamos el .jar del controlador mediante el siguiente enlace: https://go.microsoft.com/fwlink/?linkid=2168495
+
+	2.2.B-.A la hora de extraer el zip, colocamos el mismo en un sitio de referencia, a recomendación nuestra la siguiente ruta:
+	C:\Program Files
+
+	2.3.B-.Ahora nos vamos a nuestro Eclipse y hacemos click derecho sobre nuestro projecto y seleccionamos build Path -> Configure Build Path... -> Libraries -> Add JARs...
+
+	2.4.B-.Ahora entramos en la carpeta donde colocamos el driver, y nos vamos a "sqljdbc_[Version Driver Descargada]\enu" pues dentro estan los siguientes .jar para los distintos jre:
+		--mssql-jdbc-9.4.0.jre8.jar
+		--mssql-jdbc-9.4.0.jre11.jar
+		--mssql-jdbc-9.4.0.jre16.jar
+
+		(No hace falta que seleccione todos para meterlo dentro de las librerias, solo el que le venga conveniente)
+
+	2.5.B-.Una vez ya hayamos importado las librerias, seleecionamos aplicar y cerrar, además de actualizar el projecto con F5 o Click Derecho -> Refrescar.
+
+
+3-. Configuramos el SQL Server para que a la hora de tener creado el usuario, pueda entrar sin ningún problema:
+
+	3.1-.Dentro del explorador de objetos, hacemos click derecho en el icono del servidor, entonces vamos a Propiedades -> Seguridad.
+
+	3.2-.Cambiamos la autenticación a Windows y SQL Server.
+
+
+4-. Creamos un login, en otras palabras, un tipo de usuario de sql server para poder entrar a la base de datos:
+
+	4.1-.Dentro del explorador de Objetos, vamos a Seguridad -> Logins, y hacemos click derecho -> nuevo Login...
+
+	4.2-.Colocamos un nombre de usuario, cambiamos la autenticación a SQL Server y le ponemos una contraseña cualquiera
+	(Hay opciones que refuerzan la seguridad de la contraseña que aparecen con checkboxes debajo, pero pueden ser cambiados si así se desea).
+
+	4.3-.Seleccionamos bdHoteles como nuestra base de datos por defecto.
+
+	4.4-.Vamos a roles de servidor, y como mínimo seleccionamos sysadmin, para que nos deje sacar consultas de la base de datos.
+
+	4.5-.(Opcional) Vamos a Status, y comprobamos si el Login está habilitado y si le está permitido conectar a la base de datos.
+
+	4.6-.Pulsamos Ok para crear el login.
+
+
+5-. Ahora vamos a cambiar algunas propiedades del usuario que creo automáticamente el Login:
+
+	5.1-.Vamos a Explorador de Objetos -> Bases de Datos -> bdHoteles -> Seguridad -> Usuarios -> "usuarioConMismoNombreQueLogin".
+
+	5.2-.Damos doble click, y nos apareceran las propiedades.
+
+	5.3-.Ahora vamos a la parte de esquemas propios, y seleccionamos todos los posibles, así mismo con la parte de afiliación.
+
+	5.4-.Pulsamos OK.
+
+
+Ahora ya puede conectarse a la base de datos bdHoteles sin problema, si ocurre algún problema, contactar al creador de este archivo de texto.
+

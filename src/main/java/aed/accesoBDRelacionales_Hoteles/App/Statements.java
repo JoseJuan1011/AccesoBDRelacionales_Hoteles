@@ -8,8 +8,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Scanner;
 
-import aed.accesoBDRelaciones_Hoteles.resources.Conectordb;
-
 public class Statements {
 	
 	private static Connection conn;
@@ -300,7 +298,6 @@ public class Statements {
 			}
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
 			System.out.println("No se pudo realizar el procedimiento en cuestión");
 		}
 	}
@@ -330,8 +327,10 @@ public class Statements {
 	}
 
 	private static void Procedimiento2(Connection connection, int tipoDB) throws SQLException {
-		CallableStatement ps;
-		PreparedStatement paramsPS;
+		PreparedStatement MySQL_PS;
+		PreparedStatement paramPS;
+		CallableStatement SQLServerPS;
+		teclado = new Scanner(System.in);
 		conn = connection;
 		System.out.println("Escriba aquí los datos del registro a insertar: ");
 		System.out.print("codHotel, aquí las opciones -> " + codHotelComboBox() + ": ");
@@ -345,42 +344,78 @@ public class Statements {
 		System.out.print("activa: ");
 		activa = teclado.nextInt();
 		if (tipoDB==2) {
-			ps = (CallableStatement) conn.prepareStatement("EXEC proc_insert_habitacion ?,?,?,?,?,?,?");
-			ps.setString(1, codHotel);
-			ps.setInt(2, numHabitacion);
-			ps.setInt(3, capacidad);
-			ps.setInt(4, preciodia);
-			ps.setInt(5, activa);
+			SQLServerPS = (CallableStatement) conn.prepareCall("EXEC proc_insert_habitacion ?,?,?,?,?,?,?");
+			SQLServerPS.setString(1, codHotel);
+			SQLServerPS.setInt(2, numHabitacion);
+			SQLServerPS.setInt(3, capacidad);
+			SQLServerPS.setInt(4, preciodia);
+			SQLServerPS.setInt(5, activa);
 			
-			ps.registerOutParameter(6, Types.INTEGER);
-			ps.registerOutParameter(7, Types.INTEGER);
+			SQLServerPS.registerOutParameter(6, Types.INTEGER);
+			SQLServerPS.registerOutParameter(7, Types.INTEGER);
 			
-			ps.execute();
+			SQLServerPS.execute();
 			
-			System.out.println(ps.getInt(6) == 1 ? "El hotel existe" : "El hotel NO existe");
-			System.out.println(ps.getInt(7) == 1 ? "Inserccion Correcta" : "Algo malo ocurrio...");
+			System.out.println(SQLServerPS.getInt(6) == 1 ? "El hotel existe" : "El hotel NO existe");
+			System.out.println(SQLServerPS.getInt(7) == 1 ? "Inserccion Correcta" : "Algo malo ocurrio...");
 		}
 		else {
-			ps = (CallableStatement) conn.prepareStatement("call proc_insert_habitacion (?, ?, ?, ?, ?, @hotel_exists, @validate_insert);");
+			MySQL_PS = conn.prepareStatement("call proc_insert_habitacion (?, ?, ?, ?, ?, @hotel_exists, @validate_insert);");
 			
-			paramsPS = conn.prepareStatement("Select @hotel_exists, @validate_insert");
+			MySQL_PS.setString(1, codHotel);
+			MySQL_PS.setInt(2, numHabitacion);
+			MySQL_PS.setInt(3, capacidad);
+			MySQL_PS.setInt(4, preciodia);
+			MySQL_PS.setInt(5, activa);
+			MySQL_PS.executeQuery();
 			
-			ps.setString(1, codHotel);
-			ps.setInt(2, numHabitacion);
-			ps.setInt(3, capacidad);
-			ps.setInt(4, preciodia);
-			ps.setInt(5, activa);
+			paramPS = conn.prepareStatement("Select @hotel_exists, @validate_insert");
 			
-			ResultSet rs = ps.executeQuery();
+			ResultSet rs = paramPS.executeQuery();
 			
 			while (rs.next()) {
 				System.out.println(rs.getInt(1)== 1 ? "El hotel existe" : "El hotel NO existe"+", "+rs.getInt(2));
+				System.out.println(rs.getInt(2)== 1 ? "Todo se realizo con normalidad" : "No se ha podido realizar la insercción con normalidad");
 			} 
 		}
 	}
 	
-	private static void Procedimiento3(Connection connection, int tipoDB) {
+	private static void Procedimiento3(Connection connection, int tipoDB) throws SQLException {
+		teclado = new Scanner(System.in);
+		conn = connection;
+		System.out.println("Escriba los parámetros aquí: ");
+		System.out.print("nomHotel: ");
+		String nomHotel = teclado.nextLine();
+		System.out.print("preciodia: ");
+		preciodia = teclado.nextInt();
 		
+		ResultSet rs;
+		if (tipoDB==2) {
+			PreparedStatement ps = conn.prepareStatement(""
+					+ "declare @cantidadTotal tinyint, @cantidadTotal_preciodia tinyint\r\n"
+					+ "exec proc_cantidad_habitaciones ?, ?, @cantidadTotal output, @cantidadTotal_preciodia output\r\n"
+					+ "select @cantidadTotal as CantidadTotal, @cantidadTotal_preciodia as CantidadTotal_preciodia"
+			);
+			ps.setString(1, nomHotel);
+			ps.setInt(2, preciodia);
+			
+			rs = ps.executeQuery();
+		}
+		else {
+			PreparedStatement ps = conn.prepareStatement("call proc_cantidad_habitaciones (?, ?, @cantidadTotal, @cantidadTotal_preciodia);");
+			ps.setString(1, nomHotel);
+			ps.setInt(2, preciodia);
+			ps.executeQuery();
+			
+			PreparedStatement paramPS = conn.prepareStatement("select @cantidadTotal as CantidadTotal, @cantidadTotal_preciodia as CantidadTotal_preciodia;");
+			paramPS.executeQuery();
+			
+			rs = paramPS.executeQuery();
+		}
+		while (rs.next()) {
+			System.out.println("CantidadTotal de habitaciones del hotel: "+rs.getInt(1));
+			System.out.println("CantidadTotal de habitaciones del hotel, cuales preciodia sean menor que el pasado y esten activas: "+rs.getInt(2));
+		}
 	}
 	
 	private static void Procedimiento4(Connection connection, int tipoDB) throws SQLException {
@@ -390,15 +425,16 @@ public class Statements {
 		System.out.println("DNI del Cliente: ");
 		String DNI = teclado.next();
 		if (tipoDB==2) {
-			PreparedStatement paramPs = conn.prepareStatement("Declare @CantidadEstancias int"+"exec @CantidadEstancias = dbo.sp_dni_suma ?");
-			paramPs.setString(1, DNI);
-			paramPs.execute();
-			ps = conn.prepareStatement("select @CantidadEstancias as CantidadTotal");	
+			ps = conn.prepareStatement(""
+					 + "Declare @CantidadEstancias int" + "\n"
+                     + "exec @CantidadEstancias = dbo.sp_dni_suma  ?\n"
+                     + "select @CantidadEstancias as CantidadTotal"
+			);	
 		}
 		else {
 			ps = conn.prepareStatement("select sp_dni_suma(?) as CantidadTotal;");
-			ps.setString(1, DNI);
 		}
+		ps.setString(1, DNI);
 		ResultSet rs = ps.executeQuery();
 		while (rs.next()) {
 			System.out.println("Cantidad Pagada por el Cliente en cuestión: "+rs.getInt("CantidadTotal"));

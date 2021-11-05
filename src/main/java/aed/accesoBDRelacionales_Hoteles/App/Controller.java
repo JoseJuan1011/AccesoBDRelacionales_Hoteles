@@ -42,6 +42,7 @@ public class Controller {
 		}
 		catch (Exception e) {
 			System.out.println("No se pudo conectar a la base de datos en cuestión");
+			System.exit(0);
 		}
 		execOptions();
 		teclado.close();
