@@ -59,8 +59,8 @@ public class Controller {
 			setTipoAccion(teclado.nextInt());
 			if (getTipoAccion()==4) {
 				System.out.println("Elija el procedimiento a ejecutar:\n"
-						+ "1-. Insertar una habitación con parámentros de salida.\n"
-						+ "2-. Visualizar habitaciones según nombreHotel.\n"
+						+"1-. Visualizar habitaciones según nombreHotel.\n" 
+						+ "2-. Insertar una habitación con parámentros de salida.\n"
 						+ "3-. Visualizar cantidad de habitaciones normal y condicionado.\n"
 						+ "4-. Visualizar suma total pagada por un cliente."
 				);
